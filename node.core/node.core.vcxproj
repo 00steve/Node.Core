@@ -123,19 +123,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DBOUT.h" />
     <ClInclude Include="Drawable.h" />
     <ClInclude Include="int2.h" />
     <ClInclude Include="List.h" />
+    <ClInclude Include="Map.h" />
+    <ClInclude Include="Menu.h" />
     <ClInclude Include="Message.h" />
     <ClInclude Include="Node.h" />
+    <ClInclude Include="View.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Drawable.cpp" />
     <ClCompile Include="int2.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Message.cpp" />
     <ClCompile Include="Node.cpp" />
+    <ClCompile Include="View.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

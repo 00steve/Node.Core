@@ -18,6 +18,7 @@ private:
 	int width;
 	WNDCLASSEX wnd;
 
+	/*windows callback, handles all of the messages coming from windows*/
 	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 public:
@@ -26,13 +27,21 @@ public:
 
 	virtual void Draw();
 
+	unsigned int Height();
+
+	bool IsMaximized();
+
+	bool IsMinimized();
+
 	bool IsOpen();
+
+	bool IsValidWindow();
 
 	virtual void Update();
 
-	bool ValidWindow();
-
+	unsigned int Width();
 
 	Window();
+
 	~Window();
 };

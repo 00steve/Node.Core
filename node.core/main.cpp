@@ -9,23 +9,24 @@
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow) {
 
+	Map<Node> t = Map<Node>();
+	
 	Node* n = new Node();
 
 
+	t.Add("things", n);
 	Node* b = new Node();
 
-	nCmdShow = 1;
 	Window* window = new Window();
 	window->Create(nCmdShow);
 
-
-	DBOUT("valid window : " << (window->ValidWindow() ? "true" : "false"));
 	n->AddChild(b);
 
-	//window->Update();
 	while (window->IsOpen()) {
 		window->Update();
 	}
+	
+
 
 	return 0;
 }

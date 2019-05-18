@@ -51,6 +51,18 @@
     <ClInclude Include="Drawable.h">
       <Filter>Header Files\ext</Filter>
     </ClInclude>
+    <ClInclude Include="Menu.h">
+      <Filter>Header Files\node</Filter>
+    </ClInclude>
+    <ClInclude Include="View.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="Map.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="DBOUT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="int2.cpp">
@@ -68,6 +80,12 @@
     </ClCompile>
     <ClCompile Include="Drawable.cpp">
       <Filter>Source Files\ext</Filter>
+    </ClCompile>
+    <ClCompile Include="Menu.cpp">
+      <Filter>Source Files\node</Filter>
+    </ClCompile>
+    <ClCompile Include="View.cpp">
+      <Filter>Source Files\util</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

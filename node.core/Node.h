@@ -1,18 +1,19 @@
 #pragma once
-
+#include "DBOUT.h"
 #include <sstream>
+//
+//
+//#define DBOUT( s )            \
+//{                             \
+//   std::ostringstream os_;    \
+//   os_ << s;                   \
+//   OutputDebugString( os_.str().c_str() );  \
+//}
+
 
 #include "List.h";
 #include "Message.h"
-
-
-#define DBOUT( s )            \
-{                             \
-   std::ostringstream os_;    \
-   os_ << s;                   \
-   OutputDebugString( os_.str().c_str() );  \
-}
-
+#include "Map.h"
 
 
 

@@ -1,7 +1,6 @@
 #include "window.h"
 
 
-
 LRESULT CALLBACK Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	/*
 	get or set a reference to the class depending on if the window is being created
@@ -24,7 +23,7 @@ LRESULT CALLBACK Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 	}
 
 
-	char szFileName[MAX_PATH];
+	//char szFileName[MAX_PATH];
 
 
 	switch (uMsg) {
@@ -40,8 +39,8 @@ LRESULT CALLBACK Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 
 	//when the left mouse button is pushed down on the window
 	case WM_LBUTTONDOWN: 
-		GetModuleFileName(window->hinst, szFileName, MAX_PATH);
-		MessageBox(hwnd, szFileName, "This program is:", MB_OK | MB_ICONINFORMATION);
+		//GetModuleFileName(window->hinst, szFileName, MAX_PATH);
+		//MessageBox(hwnd, szFileName, "This program is:", MB_OK | MB_ICONINFORMATION);
 		break;
 
 	//case WM_NCCREATE:
@@ -91,8 +90,6 @@ LRESULT CALLBACK Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 	return 0;
 }
 
-
-
 void Window::Create(int nCmdShow) {
 
 	hinst = GetModuleHandle(NULL);
@@ -131,14 +128,28 @@ void Window::Create(int nCmdShow) {
 	ShowWindow(hwnd, nCmdShow);
 }
 
-
 void Window::Draw() {
 
 }
 
+unsigned int Window::Height() {
+	return height;
+}
 
 bool Window::IsOpen() {
 	return validWindow && IsWindow(hwnd);
+}
+
+bool Window::IsMaximized() {
+	return maximized;
+}
+
+bool Window::IsMinimized() {
+	return minimized;
+}
+
+bool Window::IsValidWindow() {
+	return validWindow;
 }
 
 void Window::Update() {
@@ -156,17 +167,15 @@ void Window::Update() {
 	Node::Update();
 }
 
-bool Window::ValidWindow() {
-	return validWindow;
+unsigned int Window::Width() {
+	return width;
 }
-
 
 Window::Window() {
 
 
 
 }
-
 
 Window::~Window() {
 
