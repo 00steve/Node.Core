@@ -1,8 +1,8 @@
 #include "Node.h"
 
 
-unsigned long long int Node::currentId = 0;
-
+unsigned long long Node::currentId = 0;
+Map<Node*> Node::directory = Map<Node*>();
 
 
 Node* Node::AddChild(Node* newChild) {
@@ -10,12 +10,9 @@ Node* Node::AddChild(Node* newChild) {
 	return newChild;
 }
 
-
-
 Node::Node() : 
 	id(currentId++) {
 }
-
 
 Node::~Node(){
 	int i = children.Count();
@@ -36,8 +33,7 @@ void Node::HandleMessages() {
 	messages.Empty();
 }
 
-
-unsigned long long int Node::Id() {
+unsigned long long Node::Id() {
 	return id;
 }
 
@@ -45,8 +41,6 @@ bool Node::ReceiveMessage(Message newMessage) {
 	messages.Push(newMessage);
 	return true;
 }
-
-
 
 Node* Node::RemoveChild(Node* oldChild) {
 	int i = children.Count();
@@ -61,6 +55,15 @@ bool Node::SendMessage(Node* receiver, unsigned int code, void* data) {
 	return false;
 }
 
+bool Node::SetName(std::string name) {
+	//bool hasNode = directory.KeyExists(name);
+	//if (hasNode) return false;
+	//this->name = name;
+	bool newName = directory.Add(name, this);
+	this->name = newName ? name : "";
+	return newName;
+	//return true;
+}
 
 Node* Node::SetParent(Node* newParent) {
 	if (parent != NULL) {
@@ -68,7 +71,6 @@ Node* Node::SetParent(Node* newParent) {
 	}
 	return parent = newParent;
 }
-
 
 void Node::Update() {
 

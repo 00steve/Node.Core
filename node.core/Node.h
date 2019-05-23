@@ -26,10 +26,17 @@ private:
 
 	static unsigned long long int currentId;
 
-	unsigned long long int id;
+	/*store a directory of all nodes that deserve
+	a name.*/
+	static Map<Node*> directory;
+
+	unsigned long long id;
 
 	List<Message> messages;
+
 	Node* parent;
+
+	std::string name;
 
 protected:
 
@@ -48,9 +55,11 @@ public:
 
 	virtual void HandleMessages();
 
-	unsigned long long int Id();
+	unsigned long long Id();
 
 	Node* RemoveChild(Node* oldChild);
+
+	bool SetName(std::string name);
 
 	Node* SetParent(Node* newParent);
 
