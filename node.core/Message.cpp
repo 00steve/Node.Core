@@ -11,6 +11,5 @@ Message::Message(Node* receiver, unsigned int code, void* data) :
 }
 
 
-Message::~Message()
-{
+Message::~Message() {
 }

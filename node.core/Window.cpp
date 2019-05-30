@@ -48,6 +48,10 @@ LRESULT CALLBACK Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 
 	case WM_PAINT://window (or part of) needs to be repainted
 	{
+		unsigned int i = window->views.Count();
+		while (i-- > 0) {
+			window->views[i]->Draw();
+		}
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(hwnd, &ps);
 		// All painting occurs here, between BeginPaint and EndPaint.
@@ -65,29 +69,48 @@ LRESULT CALLBACK Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 	//https://docs.microsoft.com/en-us/windows/desktop/winmsg/wm-size
 	case WM_SIZE:
 		//get the new width and height
-		window->width = LOWORD(lParam);
-		window->height = HIWORD(lParam);
+		window->renderSettings.Width = LOWORD(lParam);
+		window->renderSettings.Height = HIWORD(lParam);
 
 		switch (wParam) {
 		case SIZE_MINIMIZED:
-			window->minimized = true;
-			window->maximized = false;
+			window->renderSettings.Minimized = true;
+			window->renderSettings.Maximized = false;
 			break;
 		case SIZE_RESTORED:
-			window->minimized = false;
-			window->maximized = false;
+			window->renderSettings.Minimized = false;
+			window->renderSettings.Maximized = false;
 			break;
 		case SIZE_MAXIMIZED:
-			window->minimized = false;
-			window->maximized = true;
+			window->renderSettings.Minimized = false;
+			window->renderSettings.Maximized = true;
 			break;
 		}
+
+		//send message to views that the size has changed
+		window->SendMessageToAllViews(MESSAGE_PARENT_SETTINGS_CHANGED, PARENT_SETTINGS_CHANGED_SIZE,NULL);
+
 		break;
 
 	default:
 		return DefWindowProc(hwnd, uMsg, wParam, lParam);
 	}
 	return 0;
+}
+
+
+Node* Window::AddChild(Node* newNode) {
+	if (dynamic_cast<View*>(newNode)) {
+		AddView((View*)newNode);
+		Node::CreateAndSendMessage(newNode, MESSAGE_SET_RENDER_SETTINGS, (void*)&renderSettings);
+	}
+	return Node::AddChild(newNode);
+}
+
+bool Window::AddView(View* newView) {
+	if (views.Exists(newView)) return false;
+	views.Push(newView);
+	return true;
 }
 
 void Window::Create(int nCmdShow) {
@@ -122,18 +145,21 @@ void Window::Create(int nCmdShow) {
 	validWindow = !(hwnd == NULL);
 	DBOUT(GetLastError() << std::endl);
 
-	minimized = false;
+	//set the initial render settings
+	//renderSettings.Height = 0;
+	//renderSettings.Width = 0;
+	renderSettings.Minimized = false;
 
 	//UpdateWindow(hwnd);//i don't know what this does or where to call it, so I commented it out
 	ShowWindow(hwnd, nCmdShow);
 }
 
 void Window::Draw() {
-
+	DBOUT("DRAW WINDOW\n");
 }
 
 unsigned int Window::Height() {
-	return height;
+	return renderSettings.Height;
 }
 
 bool Window::IsOpen() {
@@ -141,40 +167,55 @@ bool Window::IsOpen() {
 }
 
 bool Window::IsMaximized() {
-	return maximized;
+	return renderSettings.Maximized;
 }
 
 bool Window::IsMinimized() {
-	return minimized;
+	return renderSettings.Minimized;
 }
 
 bool Window::IsValidWindow() {
 	return validWindow;
 }
 
-void Window::Update() {
 
+void Window::SendMessageToAllViews(const unsigned int code,const unsigned int subCode, void* data) {
+	unsigned int i = views.Count();
+	Message viewMessage;
+	viewMessage.code = code;
+	viewMessage.subCode = subCode;
+	viewMessage.data = data;
+	viewMessage.sender = this;
+	while (i-- > 0) {
+		//Node::CreateAndSendMessage(views[i], code, data);
+		viewMessage.receiver = views[i];
+		Node::SendAMessage(viewMessage);
+	}
+}
+
+void Window::Update() {
 	msg = { };
-	while (GetMessage(&msg, NULL, 0, 0))
-	{
+	//it gets caught in the loop because there is always a message
+	//int mCount = 0;
+	//while (GetMessage(&msg, NULL, 0, 0) && mCount++ < 10)
+	//{
+	//	TranslateMessage(&msg);
+	//	DispatchMessage(&msg);
+	//}
+	bool isMsg = GetMessage(&msg, NULL, 0, 0);
+	if (isMsg) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
-
-
-
-
 	Node::Update();
 }
 
 unsigned int Window::Width() {
-	return width;
+	return renderSettings.Width;
 }
 
-Window::Window() {
-
-
-
+Window::Window() :
+	views(List<View*>()) {
 }
 
 Window::~Window() {

@@ -69,7 +69,9 @@ private:
 	}
 
 
-	bool Insert(MapNode<Value>* parent, MapNode<Value>* child) {
+	bool Insert(MapNode<Value>* &parent, MapNode<Value>* child) {
+		//if there is no parent node, set the child as
+		//the parent node
 		if (!parent) {
 			parent = child;
 			return true;
@@ -79,17 +81,18 @@ private:
 		if (parent->hash > child->hash) {
 			return Insert(parent->left, child);
 		}
-		//if the current node is the same size or smaller than 
-		//the new node send it to the right child
+		//if the current node is the same size or smaller 
+		//than the new node send it to the right child
 		else if(parent->hash < child->hash){
 			return Insert(parent->right, child);
 		}
+		//if the child hash matches exactly what the 
+		//parent node has is
 		else return false;
 	}
 
 
 public:
-
 
 
 	bool Add(std::string key, Value value) {

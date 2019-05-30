@@ -10,8 +10,23 @@ Node* Node::AddChild(Node* newChild) {
 	return newChild;
 }
 
+bool Node::CreateAndSendMessage(Node* receiver, unsigned int code, void* data) {
+	Message newMessage = Message();
+	newMessage.receiver = receiver;
+	newMessage.code = code;
+	newMessage.data = data;
+	bool success = SendAMessage(newMessage);
+	return success;
+}
+
 Node::Node() : 
+	id(currentId++),
+	registered(false) {
+}
+
+Node::Node(std::string name) :
 	id(currentId++) {
+	Register(name);
 }
 
 Node::~Node(){
@@ -21,7 +36,7 @@ Node::~Node(){
 	}
 }
 
-void Node::HandleMessage(Message message) {
+void Node::HandleMessage(const Message message) {
 
 }
 
@@ -37,9 +52,19 @@ unsigned long long Node::Id() {
 	return id;
 }
 
-bool Node::ReceiveMessage(Message newMessage) {
+bool Node::IsRegistered() {
+	return registered;
+}
+
+bool Node::ReceiveMessage(const Message newMessage) {
 	messages.Push(newMessage);
 	return true;
+}
+
+bool Node::Register(const std::string name) {
+	registered = directory.Add(name, this);
+	this->name = registered ? name : "";
+	return registered;
 }
 
 Node* Node::RemoveChild(Node* oldChild) {
@@ -51,19 +76,11 @@ Node* Node::RemoveChild(Node* oldChild) {
 	return NULL;
 }
 
-bool Node::SendMessage(Node* receiver, unsigned int code, void* data) {
-	return false;
+bool Node::SendAMessage(const Message newMessage) {
+	if (!newMessage.receiver) return false;
+	return newMessage.receiver->ReceiveMessage(newMessage);
 }
 
-bool Node::SetName(std::string name) {
-	//bool hasNode = directory.KeyExists(name);
-	//if (hasNode) return false;
-	//this->name = name;
-	bool newName = directory.Add(name, this);
-	this->name = newName ? name : "";
-	return newName;
-	//return true;
-}
 
 Node* Node::SetParent(Node* newParent) {
 	if (parent != NULL) {
@@ -73,5 +90,13 @@ Node* Node::SetParent(Node* newParent) {
 }
 
 void Node::Update() {
+	HandleMessages();
+	unsigned int i = children.Count();
+	while (i-- > 0) {
+		children[i]->Update();
+	}
+}
 
+Node* Node::operator [] (const std::string name) {
+	return directory[name];
 }

@@ -6,6 +6,9 @@
 #define MESSAGE_STARTED 			11
 #define MESSAGE_SET_PARENT          12
 #define MESSAGE_UNSET_PARENT        13
+#define MESSAGE_PARENT_SETTINGS_CHANGED	14//sent from parent to child as a trigger that some of the parent's settings have changed
+#define			PARENT_SETTINGS_CHANGED_SIZE 1
+#define			PARENT_SETTINGS_CHANGED_STATUS 2
 
 /*drawable level functions 30-49*/
 #define MESSAGE_ADD_DRAWABLE 		30
@@ -22,6 +25,7 @@
 #define MESSAGE_ENABLE_VIEW             55
 #define MESSAGE_DISABLE_VIEW            56
 #define MESSAGE_SET_RENDER_SUBJECT      57//used by views to set what node should be drawn
+#define MESSAGE_AM_RENDER_SUBJECT		58//sent back to objects when they are set as the render subject
 
 #define MESSAGE_SELECTED 			110
 #define MESSAGE_DESELECTED 			111
@@ -62,6 +66,8 @@ can be called from any other node.*/
 #define MESSAGE_REGISTER_PHYSICS_REQUEST    925 //should send a var map of physics objects to create
 #define MESSAGE_REGISTER_PHYSICS_FINISHED   926 //should return a map that has corresponding physics objects
 
+/*graphics engine stuff*/
+#define MESSAGE_SET_RENDER_SETTINGS		1000 //is telling the receiving object to use the (RenderSettings*) pointer passed to it
 
 class Node;
 
@@ -75,6 +81,7 @@ public:
 	Node* sender;
 	Node* receiver;
 	unsigned int code;
+	unsigned int subCode;
 	void* data;
 };
 

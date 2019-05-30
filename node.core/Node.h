@@ -38,18 +38,23 @@ private:
 
 	std::string name;
 
-protected:
+	bool registered;
 
+protected:
+	
+	bool CreateAndSendMessage(Node* receiver, unsigned int code, void* data);
 	bool ReceiveMessage(Message newMessage);
-	bool SendMessage(Node* receiver, unsigned int code, void* data);
+	bool SendAMessage(Message newMessage);
 
 
 public:
 	Node();
+
+	Node(std::string name);
+
 	~Node();
 
-
-	Node* AddChild(Node* newChild);
+	virtual Node* AddChild(Node* newChild);
 
 	virtual void HandleMessage(Message message);
 
@@ -57,13 +62,16 @@ public:
 
 	unsigned long long Id();
 
-	Node* RemoveChild(Node* oldChild);
+	bool IsRegistered();
 
-	bool SetName(std::string name);
+	bool Register(std::string name);
+
+	Node* RemoveChild(Node* oldChild);
 
 	Node* SetParent(Node* newParent);
 
 	virtual void Update();
 
+	Node* operator [] (std::string name);
 };
 

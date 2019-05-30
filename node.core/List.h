@@ -18,7 +18,7 @@ protected:
 		unsigned int newLength = length * 2 + 1;
 		T* newChildren = new T[newLength];
 		memcpy(newChildren, children, sizeof(T)*length);
-		delete children;
+		delete[] children;
 		children = newChildren;
 		length = newLength;
 	}
@@ -52,6 +52,15 @@ public:
 
 	void Empty() {
 		count = 0;
+	}
+
+	bool Exists(T item) {
+		unsigned int i = count;
+		while (i--> 0) {
+			if (item != children[i]) continue;
+			return true;
+		}
+		return false;
 	}
 
 	T Pop() {
