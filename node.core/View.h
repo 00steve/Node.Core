@@ -10,7 +10,11 @@ private:
 	RenderSettings* parentRenderSettings;
 	RenderSettings renderSettings;
 
+
+
 public:
+
+	virtual Node* AddChild(Node* newNode);
 
 	virtual bool AdjustRenderSettings();
 

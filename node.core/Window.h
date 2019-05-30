@@ -10,7 +10,7 @@ class Window : public Node, public Drawable {
 private:
 	//int height;
 	HINSTANCE hinst;
-	HWND hwnd;
+	//HWND hwnd;
 	//bool maximized;
 	//bool minimized;
 	MSG msg;

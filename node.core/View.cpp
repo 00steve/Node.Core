@@ -1,6 +1,13 @@
 #include "View.h"
 
 
+Node* View::AddChild(Node* newNode) {
+	if (dynamic_cast<Graphics*>(newNode)) {
+		SetGraphics((Graphics*)newNode);
+	}
+	return Node::AddChild(newNode);
+}
+
 bool View::AdjustRenderSettings() {
 	if (!parentRenderSettings) return false;
 	//for now, just adopt the parent settings
@@ -44,10 +51,17 @@ void View::HandleMessage(const Message message) {
 bool View::SetGraphics(Graphics* newGraphics) {
 	if (graphics) {
 		//do something with the old graphics
+		Node::CreateAndSendMessage(graphics, MESSAGE_ENDED_REFERENCE, NULL);
 	}
-	bool initialized = newGraphics->Initialize();
-	graphics = initialized ? newGraphics : NULL;
-	return initialized;
+	if (!newGraphics->Initialize()) {
+		DBOUT("View graphics failed to initialize\n");
+		graphics = NULL;
+		return false;
+	}
+	graphics = newGraphics;
+	Node::CreateAndSendMessage(graphics, MESSAGE_STARTED_REFERENCE, NULL);
+	Node::CreateAndSendMessage(graphics, MESSAGE_SET_RENDER_SETTINGS, (void*)&renderSettings);
+	return true;
 }
 
 void View::Update() {

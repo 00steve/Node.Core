@@ -31,24 +31,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow
 	View* v1 = new View();
 	window->AddChild(v1);
 
-
-	View* v2 = new View();
-	window->AddChild(v2);
-
-
-	View* v3 = new View();
-	window->AddChild(v3);
-
-	View* v4 = new View();
-	window->AddChild(v4);
-
-	//View* v2 = new View();
-
-	//window->AddView(v2);
-
-	//DirectX3DGraphics* dx3 = new DirectX3DGraphics();
-
-
+	DirectX3DGraphics* dx3 = new DirectX3DGraphics();
+	v1->AddChild(dx3);
 	//v1->SetGraphics(dx3);
 	//window->AddView(v1);
 

@@ -9,6 +9,8 @@
 #define MESSAGE_PARENT_SETTINGS_CHANGED	14//sent from parent to child as a trigger that some of the parent's settings have changed
 #define			PARENT_SETTINGS_CHANGED_SIZE 1
 #define			PARENT_SETTINGS_CHANGED_STATUS 2
+#define MESSAGE_STARTED_REFERENCE	15//sent from a node to another node when it will start referencing the receiving node
+#define MESSAGE_ENDED_REFERENCE		16//sent from a node to another node when it will no longer reference the receiving node
 
 /*drawable level functions 30-49*/
 #define MESSAGE_ADD_DRAWABLE 		30

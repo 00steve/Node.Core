@@ -41,9 +41,10 @@ void Node::HandleMessage(const Message message) {
 }
 
 void Node::HandleMessages() {
-	unsigned int i = messages.Count();
-	while (i --> 0) {
+	unsigned int i = 0, n = messages.Count();
+	while (i < n) {
 		HandleMessage(messages[i]);
+		i++;
 	}
 	messages.Empty();
 }

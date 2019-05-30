@@ -128,7 +128,7 @@ void Window::Create(int nCmdShow) {
 		DBOUT(GetLastError() << std::endl);
 	}
 
-	hwnd = CreateWindowEx(
+	renderSettings.Window = CreateWindowEx(
 		0,                              // Optional window styles.
 		wnd.lpszClassName,                     // Window class
 		"Learn to Program Windows",    // Window text
@@ -142,7 +142,7 @@ void Window::Create(int nCmdShow) {
 		this     // Additional application data (pass in a reference to this object so it can be got later
 	);
 
-	validWindow = !(hwnd == NULL);
+	validWindow = !(renderSettings.Window == NULL);
 	DBOUT(GetLastError() << std::endl);
 
 	//set the initial render settings
@@ -151,7 +151,7 @@ void Window::Create(int nCmdShow) {
 	renderSettings.Minimized = false;
 
 	//UpdateWindow(hwnd);//i don't know what this does or where to call it, so I commented it out
-	ShowWindow(hwnd, nCmdShow);
+	ShowWindow(renderSettings.Window, nCmdShow);
 }
 
 void Window::Draw() {
@@ -163,7 +163,7 @@ unsigned int Window::Height() {
 }
 
 bool Window::IsOpen() {
-	return validWindow && IsWindow(hwnd);
+	return validWindow && IsWindow(renderSettings.Window);
 }
 
 bool Window::IsMaximized() {
@@ -214,8 +214,7 @@ unsigned int Window::Width() {
 	return renderSettings.Width;
 }
 
-Window::Window() :
-	views(List<View*>()) {
+Window::Window() {
 }
 
 Window::~Window() {

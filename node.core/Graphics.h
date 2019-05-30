@@ -1,21 +1,28 @@
 #pragma once
 
+
+#include <Windows.h>
+
 struct RenderSettings {
 	unsigned int Height;
 	bool Minimized;
 	bool Maximized;
 	unsigned int Width;
+	HWND Window;
 };
-
-
-
 
 #include "Drawable.h"
 #include "Node.h"
 
+
+
+
+
+
+
 class Graphics : public Drawable, public Node{
 private:
-	RenderSettings* renderSettings;
+	RenderSettings* parentRenderSettings;
 	Drawable* target;
 
 public:
@@ -24,6 +31,8 @@ public:
 
 	Graphics();
 	~Graphics();
+
+	virtual void HandleMessage(Message message);
 
 	virtual bool Initialize() = 0;
 
