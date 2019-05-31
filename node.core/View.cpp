@@ -33,6 +33,7 @@ void View::HandleMessage(const Message message) {
 
 	case MESSAGE_SET_RENDER_SETTINGS: 
 		parentRenderSettings = (RenderSettings*)message.data;
+		renderSettings = *parentRenderSettings;
 		return;
 	
 	case MESSAGE_SET_RENDER_SUBJECT: {

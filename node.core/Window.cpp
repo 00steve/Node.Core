@@ -132,7 +132,7 @@ void Window::Create(int nCmdShow) {
 	renderSettings.Window = CreateWindowEx(
 		0,                              // Optional window styles.
 		wnd.lpszClassName,                     // Window class
-		"Learn to Program Windows",    // Window text
+		"",    // Window text
 		WS_OVERLAPPEDWINDOW,            // Window style
 
 		// Size and position

@@ -45,9 +45,12 @@ private:
 	// Can be toggled with the Alt+Enter or F11
 	bool g_Fullscreen = false;
 
+	uint32_t numDescriptors = 1;
+
 	ComPtr<IDXGIAdapter4> dxgiAdapter4;
 	ComPtr<ID3D12Device2> device;
 	ComPtr<ID3D12CommandQueue> commandQueue;
+	ComPtr<IDXGISwapChain4> dxgiSwapChain;
 
 protected:
 	bool CheckTearingSupport();

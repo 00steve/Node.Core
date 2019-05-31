@@ -169,7 +169,6 @@ bool DirectX3DGraphics::Initialize() {
 	//	ComPtr<ID3D12CommandQueue> commandQueue,
 	//	uint32_t width, uint32_t height, uint32_t bufferCount)
 	//{
-	ComPtr<IDXGISwapChain4> dxgiSwapChain4;
 	ComPtr<IDXGIFactory4> dxgiFactory4;
 	createFactoryFlags = 0;
 	#if defined(_DEBUG)
@@ -202,22 +201,38 @@ bool DirectX3DGraphics::Initialize() {
 	}
 
 	ComPtr<IDXGISwapChain1> swapChain1;
-	//ThrowIfFailed(dxgiFactory4->CreateSwapChainForHwnd(
-	//	commandQueue.Get(),
-	//	parentRenderSettings->Window,
-	//	&swapChainDesc,
-	//	nullptr,
-	//	nullptr,
-	//	&swapChain1)
-	//);
+	ThrowIfFailed(dxgiFactory4->CreateSwapChainForHwnd(
+		commandQueue.Get(),
+		parentRenderSettings->Window,
+		&swapChainDesc,
+		nullptr,
+		nullptr,
+		&swapChain1)
+	);
 
-	//// Disable the Alt+Enter fullscreen toggle feature. Switching to fullscreen
-	//// will be handled manually.
-	//ThrowIfFailed(dxgiFactory4->MakeWindowAssociation(parentRenderSettings->Window, DXGI_MWA_NO_ALT_ENTER));
-
-	//ThrowIfFailed(swapChain1.As(&dxgiSwapChain4));
-
+	// Disable the Alt+Enter fullscreen toggle feature. Switching to fullscreen
+	// will be handled manually.
+	ThrowIfFailed(dxgiFactory4->MakeWindowAssociation(parentRenderSettings->Window, DXGI_MWA_NO_ALT_ENTER));
+	ThrowIfFailed(swapChain1.As(&dxgiSwapChain));
 	//return dxgiSwapChain4;
+
+
+	//ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(ComPtr<ID3D12Device2> device,
+	//	D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t numDescriptors)
+	//{
+	//ComPtr<ID3D12DescriptorHeap> descriptorHeap;
+
+	//D3D12_DESCRIPTOR_HEAP_DESC desc = {};
+	//desc.NumDescriptors = numDescriptors;
+	//desc.Type = type;
+
+	//ThrowIfFailed(device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&descriptorHeap)));
+
+	//return descriptorHeap;
+
+
+
+
 
 
 	isInitialized = true;
