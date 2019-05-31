@@ -51,17 +51,18 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow
 
 
 	Window* window = new Window();
+	window->Create(nCmdShow);
 
 	View* v1 = new View();
 	window->AddChild(v1);
 
 	DirectX3DGraphics* dx3 = new DirectX3DGraphics();
 	v1->AddChild(dx3);
+
 	//v1->SetGraphics(dx3);
 	//window->AddView(v1);
 
 
-	window->Create(nCmdShow);
 	while (window->IsOpen()) {
 		window->Update();
 	}

@@ -102,7 +102,6 @@ LRESULT CALLBACK Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 Node* Window::AddChild(Node* newNode) {
 	if (dynamic_cast<View*>(newNode)) {
 		AddView((View*)newNode);
-		Node::CreateAndSendMessage(newNode, MESSAGE_SET_RENDER_SETTINGS, (void*)&renderSettings);
 	}
 	return Node::AddChild(newNode);
 }
@@ -110,6 +109,8 @@ Node* Window::AddChild(Node* newNode) {
 bool Window::AddView(View* newView) {
 	if (views.Exists(newView)) return false;
 	views.Push(newView);
+	Node::CreateAndSendMessage(newView, MESSAGE_SET_RENDER_SETTINGS, (void*)&renderSettings);
+	newView->HandleMessages();
 	return true;
 }
 

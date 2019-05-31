@@ -11,11 +11,7 @@ using namespace Microsoft::WRL;
 
 // D3D12 extension library.
 #include "d3dx12.h"
-
-
 #include <exception>
-
-
 
 
 //include project headers
@@ -26,7 +22,7 @@ private:
 
 
 	// Use WARP adapter
-	bool g_UseWarp = false;
+	bool useWarp = true;
 	uint32_t g_ClientWidth = 1280;
 	uint32_t g_ClientHeight = 720;
 	// Set to true once the DX12 objects have been initialized.
@@ -49,6 +45,12 @@ private:
 	// Can be toggled with the Alt+Enter or F11
 	bool g_Fullscreen = false;
 
+	ComPtr<IDXGIAdapter4> dxgiAdapter4;
+	ComPtr<ID3D12Device2> device;
+	ComPtr<ID3D12CommandQueue> commandQueue;
+
+protected:
+	bool CheckTearingSupport();
 
 public:
 	DirectX3DGraphics();

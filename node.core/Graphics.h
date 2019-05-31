@@ -22,8 +22,11 @@ struct RenderSettings {
 
 class Graphics : public Drawable, public Node{
 private:
-	RenderSettings* parentRenderSettings;
 	Drawable* target;
+
+protected:
+
+	RenderSettings* parentRenderSettings;
 
 public:
 

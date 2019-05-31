@@ -3,7 +3,8 @@
 
 Node* View::AddChild(Node* newNode) {
 	if (dynamic_cast<Graphics*>(newNode)) {
-		SetGraphics((Graphics*)newNode);
+		Graphics* newGraphics = (Graphics*)newNode;
+		SetGraphics(newGraphics);
 	}
 	return Node::AddChild(newNode);
 }
@@ -53,6 +54,10 @@ bool View::SetGraphics(Graphics* newGraphics) {
 		//do something with the old graphics
 		Node::CreateAndSendMessage(graphics, MESSAGE_ENDED_REFERENCE, NULL);
 	}
+
+	Node::CreateAndSendMessage(newGraphics, MESSAGE_SET_RENDER_SETTINGS, (void*)&renderSettings);
+	newGraphics->HandleMessages();
+
 	if (!newGraphics->Initialize()) {
 		DBOUT("View graphics failed to initialize\n");
 		graphics = NULL;

@@ -3,7 +3,8 @@
 
 
 
-Graphics::Graphics(){
+Graphics::Graphics() : 
+	parentRenderSettings(NULL) {
 }
 
 Graphics::~Graphics() {
