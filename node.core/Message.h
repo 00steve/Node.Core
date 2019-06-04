@@ -70,6 +70,7 @@ can be called from any other node.*/
 
 /*graphics engine stuff*/
 #define MESSAGE_SET_RENDER_SETTINGS		1000 //is telling the receiving object to use the (RenderSettings*) pointer passed to it
+#define MESSAGE_RENDER_SETTINGS_CHANGED 1001 //tell whoever it is sent to that your settings have changed
 
 class Node;
 

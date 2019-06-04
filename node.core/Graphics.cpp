@@ -20,6 +20,7 @@ void Graphics::HandleMessage(const Message message) {
 
 	case MESSAGE_SET_RENDER_SETTINGS:
 		parentRenderSettings = (RenderSettings*)message.data;
+		DBOUT("Graphics:set render settings\n");
 		return;
 
 	case MESSAGE_STARTED_REFERENCE:
@@ -32,6 +33,9 @@ void Graphics::HandleMessage(const Message message) {
 	return Node::HandleMessage(message);
 }
 
+RenderSettings* Graphics::GraphicsRenderSettings() {
+	return parentRenderSettings;
+}
 
 bool Graphics::SetTarget(Drawable* newTarget) {
 	target = newTarget;

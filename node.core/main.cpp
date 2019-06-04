@@ -52,6 +52,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow
 
 	Window* window = new Window();
 
+
 	View* v1 = new View();
 	window->AddChild(v1);
 

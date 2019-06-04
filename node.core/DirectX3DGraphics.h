@@ -25,6 +25,11 @@ using namespace Microsoft::WRL;
 //include project headers
 #include "Graphics.h"
 
+
+/*so much of this class is ripped right from :
+https://www.3dgep.com/learning-directx12-1/#DirectX_12_Demo
+*/
+
 class DirectX3DGraphics : public Graphics {
 private:
 	HWND g_hWnd;
@@ -67,6 +72,12 @@ private:
 	// Can be toggled with the Alt+Enter or F11
 	bool g_Fullscreen = false;
 
+	static uint64_t frameCounter;
+	static double elapsedSeconds;
+	static std::chrono::high_resolution_clock clock;
+	static std::chrono::steady_clock::time_point t0;
+
+
 	bool CheckTearingSupport();
 
 	ComPtr<ID3D12CommandAllocator> CreateCommandAllocator(ComPtr<ID3D12Device2> device, D3D12_COMMAND_LIST_TYPE type);
@@ -85,13 +96,19 @@ private:
 
 	ComPtr<IDXGISwapChain4> CreateSwapChain(HWND hWnd, ComPtr<ID3D12CommandQueue> commandQueue, uint32_t width, uint32_t height, uint32_t bufferCount);
 
+	void Flush(ComPtr<ID3D12CommandQueue> commandQueue, ComPtr<ID3D12Fence> fence, uint64_t& fenceValue, HANDLE fenceEvent);
+
 	ComPtr<IDXGIAdapter4> GetAdapter(bool useWarp);
+
+	void Resize(uint32_t width, uint32_t height);
+
+	void SetFullscreen(bool fullscreen);
 
 	uint64_t Signal(ComPtr<ID3D12CommandQueue> commandQueue, ComPtr<ID3D12Fence> fence, uint64_t& fenceValue);
 
 	void UpdateRenderTargetViews(ComPtr<ID3D12Device2> device, ComPtr<IDXGISwapChain4> swapChain, ComPtr<ID3D12DescriptorHeap> descriptorHeap);
 
-	void WaitForFenceValue(ComPtr<ID3D12Fence> fence, uint64_t fenceValue, HANDLE fenceEvent, std::chrono::milliseconds duration);
+	void WaitForFenceValue(ComPtr<ID3D12Fence> fence, uint64_t fenceValue, HANDLE fenceEvent);
 public:
 	DirectX3DGraphics();
 	~DirectX3DGraphics();

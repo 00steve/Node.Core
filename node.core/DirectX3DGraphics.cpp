@@ -1,5 +1,16 @@
 #include "DirectX3DGraphics.h"
 
+//static variables
+uint64_t DirectX3DGraphics::frameCounter = 0;
+double DirectX3DGraphics::elapsedSeconds = 0.0;
+std::chrono::high_resolution_clock DirectX3DGraphics::clock;
+std::chrono::steady_clock::time_point DirectX3DGraphics::t0 = clock.now();
+
+
+
+
+
+
 bool DirectX3DGraphics::CheckTearingSupport() {
 	BOOL allowTearing = FALSE;
 
@@ -184,14 +195,59 @@ ComPtr<IDXGISwapChain4> DirectX3DGraphics::CreateSwapChain(HWND hWnd, ComPtr<ID3
 
 
 DirectX3DGraphics::DirectX3DGraphics(){
+	//g_CurrentBackBufferIndex = 0;
 }
 
 
 DirectX3DGraphics::~DirectX3DGraphics(){
+	Flush(g_CommandQueue, g_Fence, g_FenceValue, g_FenceEvent);
+	::CloseHandle(g_FenceEvent);
 }
 
 
 void DirectX3DGraphics::Draw() {
+	auto commandAllocator = g_CommandAllocators[g_CurrentBackBufferIndex];
+	auto backBuffer = g_BackBuffers[g_CurrentBackBufferIndex];
+
+	commandAllocator->Reset();
+	g_CommandList->Reset(commandAllocator.Get(), nullptr);
+	// Clear the render target.
+	{
+		CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+			backBuffer.Get(),
+			D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+		g_CommandList->ResourceBarrier(1, &barrier);
+		FLOAT clearColor[] = { 0.4f, 0.6f, 0.9f, 1.0f };
+		CD3DX12_CPU_DESCRIPTOR_HANDLE rtv(g_RTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart(),
+			g_CurrentBackBufferIndex, g_RTVDescriptorSize);
+
+		g_CommandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
+	}
+	// Present
+	{
+		CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+			backBuffer.Get(),
+			D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+		g_CommandList->ResourceBarrier(1, &barrier);
+		ThrowIfFailed(g_CommandList->Close());
+
+		ID3D12CommandList* const commandLists[] = {
+			g_CommandList.Get()
+		};
+		g_CommandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
+		UINT syncInterval = g_VSync ? 1 : 0;
+		UINT presentFlags = g_TearingSupported && !g_VSync ? DXGI_PRESENT_ALLOW_TEARING : 0;
+		ThrowIfFailed(g_SwapChain->Present(syncInterval, presentFlags));
+
+		g_FrameFenceValues[g_CurrentBackBufferIndex] = Signal(g_CommandQueue, g_Fence, g_FenceValue);
+
+		g_CurrentBackBufferIndex = g_SwapChain->GetCurrentBackBufferIndex();
+
+		WaitForFenceValue(g_Fence, g_FrameFenceValues[g_CurrentBackBufferIndex], g_FenceEvent);
+	}
+
+	DBOUT("Ddraw\n");
 }
 
 
@@ -204,6 +260,12 @@ void DirectX3DGraphics::EnableDebugLayer(){
 		ThrowIfFailed(D3D12GetDebugInterface(IID_PPV_ARGS(&debugInterface)));
 		debugInterface->EnableDebugLayer();
 	#endif
+}
+
+
+void DirectX3DGraphics::Flush(ComPtr<ID3D12CommandQueue> commandQueue, ComPtr<ID3D12Fence> fence, uint64_t& fenceValue, HANDLE fenceEvent) {
+	uint64_t fenceValueForSignal = Signal(commandQueue, fence, fenceValue);
+	WaitForFenceValue(fence, fenceValueForSignal, fenceEvent);
 }
 
 
@@ -249,15 +311,71 @@ ComPtr<IDXGIAdapter4> DirectX3DGraphics::GetAdapter(bool useWarp) {
 
 
 bool DirectX3DGraphics::Initialize() {
-
-
+	RenderSettings* rs = GraphicsRenderSettings();
+	if (!rs || !rs->Window) return false;
+	DBOUT("Has valid window handle\n");
 
 	EnableDebugLayer();
 
+	// Windows 10 Creators update adds Per Monitor V2 DPI awareness context.
+// Using this awareness context allows the client area of the window 
+// to achieve 100% scaling while still allowing non-client window content to 
+// be rendered in a DPI sensitive fashion.
+	SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+
+	// Window class name. Used for registering / creating the window.
+	const wchar_t* windowClassName = L"DX12WindowClass";
+	//ParseCommandLineArguments();
 
 
+	g_TearingSupported = CheckTearingSupport();
+
+	//RegisterWindowClass(hInstance, windowClassName);
+	//g_hWnd = CreateWindow(windowClassName, hInstance, L"Learning DirectX 12",
+	//	g_ClientWidth, g_ClientHeight);
+
+	// Initialize the global window rect variable.
+	::GetWindowRect(g_hWnd, &g_WindowRect);
+
+	ComPtr<IDXGIAdapter4> dxgiAdapter4 = GetAdapter(g_UseWarp);
+
+	g_Device = CreateDevice(dxgiAdapter4);
+
+	g_CommandQueue = CreateCommandQueue(g_Device, D3D12_COMMAND_LIST_TYPE_DIRECT);
+
+	g_SwapChain = CreateSwapChain(g_hWnd, g_CommandQueue,
+		g_ClientWidth, g_ClientHeight, g_NumFrames);
+
+	g_CurrentBackBufferIndex = g_SwapChain->GetCurrentBackBufferIndex();
+
+	g_RTVDescriptorHeap = CreateDescriptorHeap(g_Device, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, g_NumFrames);
+	g_RTVDescriptorSize = g_Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
+	UpdateRenderTargetViews(g_Device, g_SwapChain, g_RTVDescriptorHeap);
+
+	for (int i = 0; i < g_NumFrames; ++i)
+	{
+		g_CommandAllocators[i] = CreateCommandAllocator(g_Device, D3D12_COMMAND_LIST_TYPE_DIRECT);
+	}
+	g_CommandList = CreateCommandList(g_Device, g_CommandAllocators[g_CurrentBackBufferIndex], D3D12_COMMAND_LIST_TYPE_DIRECT);
+
+	g_Fence = CreateFence(g_Device);
+	g_FenceEvent = CreateEventHandle();
 
 	isInitialized = true;
+
+	//::ShowWindow(g_hWnd, SW_SHOW);
+
+	//MSG msg = {};
+	//while (msg.message != WM_QUIT)
+	//{
+	//	if (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+	//	{
+	//		::TranslateMessage(&msg);
+	//		::DispatchMessage(&msg);
+	//	}
+	//}
+
 	DBOUT("-  Initialized dx3d graphics\n");
 	return true;
 }
@@ -265,6 +383,84 @@ bool DirectX3DGraphics::Initialize() {
 
 bool DirectX3DGraphics::IsInitialized() {
 	return isInitialized;
+}
+
+
+void DirectX3DGraphics::Resize(uint32_t width, uint32_t height){
+	if (g_ClientWidth != width || g_ClientHeight != height)
+	{
+		// Don't allow 0 size swap chain back buffers.
+		g_ClientWidth = std::max(1u, width);
+		g_ClientHeight = std::max(1u, height);
+
+		// Flush the GPU queue to make sure the swap chain's back buffers
+		// are not being referenced by an in-flight command list.
+		Flush(g_CommandQueue, g_Fence, g_FenceValue, g_FenceEvent);
+		for (int i = 0; i < g_NumFrames; ++i)
+		{
+			// Any references to the back buffers must be released
+			// before the swap chain can be resized.
+			g_BackBuffers[i].Reset();
+			g_FrameFenceValues[i] = g_FrameFenceValues[g_CurrentBackBufferIndex];
+		}
+		DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
+		ThrowIfFailed(g_SwapChain->GetDesc(&swapChainDesc));
+		ThrowIfFailed(g_SwapChain->ResizeBuffers(g_NumFrames, g_ClientWidth, g_ClientHeight,
+			swapChainDesc.BufferDesc.Format, swapChainDesc.Flags));
+
+		g_CurrentBackBufferIndex = g_SwapChain->GetCurrentBackBufferIndex();
+
+		UpdateRenderTargetViews(g_Device, g_SwapChain, g_RTVDescriptorHeap);
+	}
+}
+
+
+void DirectX3DGraphics::SetFullscreen(bool fullscreen) {
+	if (g_Fullscreen != fullscreen)
+	{
+		g_Fullscreen = fullscreen;
+
+		if (g_Fullscreen) // Switching to fullscreen.
+		{
+			// Store the current window dimensions so they can be restored 
+			// when switching out of fullscreen state.
+			::GetWindowRect(g_hWnd, &g_WindowRect);
+			// Set the window style to a borderless window so the client area fills
+			// the entire screen.
+			UINT windowStyle = WS_OVERLAPPEDWINDOW & ~(WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX);
+
+			::SetWindowLongW(g_hWnd, GWL_STYLE, windowStyle);
+			// Query the name of the nearest display device for the window.
+// This is required to set the fullscreen dimensions of the window
+// when using a multi-monitor setup.
+			HMONITOR hMonitor = ::MonitorFromWindow(g_hWnd, MONITOR_DEFAULTTONEAREST);
+			MONITORINFOEX monitorInfo = {};
+			monitorInfo.cbSize = sizeof(MONITORINFOEX);
+			::GetMonitorInfo(hMonitor, &monitorInfo);
+			::SetWindowPos(g_hWnd, HWND_TOP,
+				monitorInfo.rcMonitor.left,
+				monitorInfo.rcMonitor.top,
+				monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left,
+				monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top,
+				SWP_FRAMECHANGED | SWP_NOACTIVATE);
+
+			::ShowWindow(g_hWnd, SW_MAXIMIZE);
+		}
+		else
+		{
+			// Restore all the window decorators.
+			::SetWindowLong(g_hWnd, GWL_STYLE, WS_OVERLAPPEDWINDOW);
+
+			::SetWindowPos(g_hWnd, HWND_NOTOPMOST,
+				g_WindowRect.left,
+				g_WindowRect.top,
+				g_WindowRect.right - g_WindowRect.left,
+				g_WindowRect.bottom - g_WindowRect.top,
+				SWP_FRAMECHANGED | SWP_NOACTIVATE);
+
+			::ShowWindow(g_hWnd, SW_NORMAL);
+		}
+	}
 }
 
 
@@ -288,6 +484,22 @@ void DirectX3DGraphics::ThrowIfFailed(HRESULT hr)
 
 void DirectX3DGraphics::Update() {
 	HandleMessages();
+
+	frameCounter++;
+	auto t1 = clock.now();
+	auto deltaTime = t1 - t0;
+	t0 = t1;
+	elapsedSeconds += deltaTime.count() * 1e-9;
+	if (elapsedSeconds > 1.0)
+	{
+		char buffer[500];
+		auto fps = frameCounter / elapsedSeconds;
+		sprintf_s(buffer, 500, "FPS: %f\n", fps);
+		OutputDebugString(buffer);
+
+		frameCounter = 0;
+		elapsedSeconds = 0.0;
+	}
 }
 
 
@@ -310,8 +522,8 @@ void DirectX3DGraphics::UpdateRenderTargetViews(ComPtr<ID3D12Device2> device, Co
 }
 
 
-void DirectX3DGraphics::WaitForFenceValue(ComPtr<ID3D12Fence> fence, uint64_t fenceValue, HANDLE fenceEvent, std::chrono::milliseconds duration = std::chrono::milliseconds::max()) {
-	
+void DirectX3DGraphics::WaitForFenceValue(ComPtr<ID3D12Fence> fence, uint64_t fenceValue, HANDLE fenceEvent) {
+	std::chrono::milliseconds duration = std::chrono::milliseconds::max();
 	if (fence->GetCompletedValue() < fenceValue)
 	{
 		ThrowIfFailed(fence->SetEventOnCompletion(fenceValue, fenceEvent));

@@ -36,6 +36,7 @@ public:
 
 	virtual bool Initialize() = 0;
 
+	RenderSettings* GraphicsRenderSettings();
 
 	virtual bool SetTarget(Drawable* newTarget);
 

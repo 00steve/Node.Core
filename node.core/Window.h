@@ -25,7 +25,7 @@ private:
 
 protected:
 
-	void SendMessageToAllViews(unsigned int code, unsigned int subCode, void* data);
+	void SendMessageToAllViews(unsigned int code, unsigned int subCode, void* data, bool immediate);
 
 
 public:

@@ -88,7 +88,7 @@ LRESULT CALLBACK Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 		}
 
 		//send message to views that the size has changed
-		window->SendMessageToAllViews(MESSAGE_PARENT_SETTINGS_CHANGED, PARENT_SETTINGS_CHANGED_SIZE,NULL);
+		window->SendMessageToAllViews(MESSAGE_PARENT_SETTINGS_CHANGED, PARENT_SETTINGS_CHANGED_SIZE,NULL,true);
 
 		break;
 
@@ -102,7 +102,14 @@ LRESULT CALLBACK Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 Node* Window::AddChild(Node* newNode) {
 	if (dynamic_cast<View*>(newNode)) {
 		AddView((View*)newNode);
-		Node::CreateAndSendMessage(newNode, MESSAGE_SET_RENDER_SETTINGS, (void*)&renderSettings);
+		//Node::CreateAndSendMessage(newNode, MESSAGE_SET_RENDER_SETTINGS, (void*)&renderSettings);
+		Node::CreateAndSendMessageImmediate(newNode, MESSAGE_SET_RENDER_SETTINGS, (void*)&renderSettings);
+		//Message m;
+		//m.sender = this;
+		//m.receiver = newNode;
+		//m.code = MESSAGE_SET_RENDER_SETTINGS;
+		//m.data = (void*)&renderSettings;
+		//newNode->HandleMessage(m);
 	}
 	return Node::AddChild(newNode);
 }
@@ -150,6 +157,8 @@ void Window::Create(int nCmdShow) {
 	//renderSettings.Width = 0;
 	renderSettings.Minimized = false;
 
+	Window::SendMessageToAllViews(MESSAGE_RENDER_SETTINGS_CHANGED, NULL,NULL,true );
+
 	//UpdateWindow(hwnd);//i don't know what this does or where to call it, so I commented it out
 	ShowWindow(renderSettings.Window, nCmdShow);
 }
@@ -179,18 +188,26 @@ bool Window::IsValidWindow() {
 }
 
 
-void Window::SendMessageToAllViews(const unsigned int code,const unsigned int subCode, void* data) {
+void Window::SendMessageToAllViews(const unsigned int code,const unsigned int subCode, void* data,bool immediate) {
 	unsigned int i = views.Count();
+
 	Message viewMessage;
 	viewMessage.code = code;
 	viewMessage.subCode = subCode;
 	viewMessage.data = data;
-	viewMessage.sender = this;
+	viewMessage.sender = this;	
 	while (i-- > 0) {
-		//Node::CreateAndSendMessage(views[i], code, data);
 		viewMessage.receiver = views[i];
-		Node::SendAMessage(viewMessage);
+		if (immediate) {
+			views[i]->HandleMessage(viewMessage);
+		}
+		else {
+			(void)Node::SendAMessage(viewMessage);
+		}
 	}
+
+
+
 }
 
 void Window::Update() {

@@ -43,6 +43,7 @@ private:
 protected:
 	
 	bool CreateAndSendMessage(Node* receiver, unsigned int code, void* data);
+	void CreateAndSendMessageImmediate(Node* receiver, unsigned int code, void* data);
 	bool ReceiveMessage(Message newMessage);
 	bool SendAMessage(Message newMessage);
 

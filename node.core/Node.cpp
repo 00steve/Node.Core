@@ -19,6 +19,15 @@ bool Node::CreateAndSendMessage(Node* receiver, unsigned int code, void* data) {
 	return success;
 }
 
+void Node::CreateAndSendMessageImmediate(Node* receiver, unsigned int code, void* data) {
+	Message newMessage = Message();
+	newMessage.receiver = receiver;
+	newMessage.code = code;
+	newMessage.data = data;
+	receiver->HandleMessage(newMessage);
+}
+
+
 Node::Node() : 
 	id(currentId++),
 	registered(false) {
