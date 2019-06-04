@@ -23,7 +23,21 @@ using namespace Microsoft::WRL;
 
 class DirectX3DGraphics : public Graphics {
 private:
+	HWND g_hWnd;
+	// Window rectangle (used to toggle fullscreen state).
+	RECT g_WindowRect;
 
+	// The number of swap chain back buffers.
+	const uint8_t g_NumFrames = 3;
+
+	// DirectX 12 Objects
+	ComPtr<ID3D12Device2> g_Device;
+	ComPtr<ID3D12CommandQueue> g_CommandQueue;
+	ComPtr<IDXGISwapChain4> g_SwapChain;
+	ComPtr<ID3D12Resource> g_BackBuffers[3];
+	ComPtr<ID3D12GraphicsCommandList> g_CommandList;
+	ComPtr<ID3D12CommandAllocator> g_CommandAllocators[3];
+	ComPtr<ID3D12DescriptorHeap> g_RTVDescriptorHeap;
 
 	// Use WARP adapter
 	bool g_UseWarp = false;
@@ -48,6 +62,8 @@ private:
 	// By default, use windowed mode.
 	// Can be toggled with the Alt+Enter or F11
 	bool g_Fullscreen = false;
+
+	ComPtr<IDXGIAdapter4> GetAdapter(bool useWarp);
 
 
 public:

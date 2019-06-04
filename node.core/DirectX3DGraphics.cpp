@@ -25,22 +25,56 @@ void DirectX3DGraphics::EnableDebugLayer(){
 }
 
 
+ComPtr<IDXGIAdapter4> DirectX3DGraphics::GetAdapter(bool useWarp) {
+
+	ComPtr<IDXGIFactory4> dxgiFactory;
+	UINT createFactoryFlags = 0;
+	#if defined(_DEBUG)
+		createFactoryFlags = DXGI_CREATE_FACTORY_DEBUG;
+	#endif
+
+	ThrowIfFailed(CreateDXGIFactory2(createFactoryFlags, IID_PPV_ARGS(&dxgiFactory)));
+	ComPtr<IDXGIAdapter1> dxgiAdapter1;
+	ComPtr<IDXGIAdapter4> dxgiAdapter4;
+
+	//if (useWarp)
+	//{
+	//	ThrowIfFailed(dxgiFactory->EnumWarpAdapter(IID_PPV_ARGS(&dxgiAdapter1)));
+	//	ThrowIfFailed(dxgiAdapter1.As(&dxgiAdapter4));
+	//}
+	//else
+	//{
+	//	SIZE_T maxDedicatedVideoMemory = 0;
+	//	for (UINT i = 0; dxgiFactory->EnumAdapters1(i, &dxgiAdapter1) != DXGI_ERROR_NOT_FOUND; ++i)
+	//	{
+	//		DXGI_ADAPTER_DESC1 dxgiAdapterDesc1;
+	//		dxgiAdapter1->GetDesc1(&dxgiAdapterDesc1);
+
+	//		// Check to see if the adapter can create a D3D12 device without actually 
+	//		// creating it. The adapter with the largest dedicated video memory
+	//		// is favored.
+	//		if ((dxgiAdapterDesc1.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) == 0 &&
+	//			SUCCEEDED(D3D12CreateDevice(dxgiAdapter1.Get(),
+	//				D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device), nullptr)) &&
+	//			dxgiAdapterDesc1.DedicatedVideoMemory > maxDedicatedVideoMemory)
+	//		{
+	//			maxDedicatedVideoMemory = dxgiAdapterDesc1.DedicatedVideoMemory;
+	//			ThrowIfFailed(dxgiAdapter1.As(&dxgiAdapter4));
+	//		}
+	//	}
+	//}
+
+	return dxgiAdapter4;
+}
+
+
+
+
+
+
+
 bool DirectX3DGraphics::Initialize() {
-	HWND g_hWnd;
-	// Window rectangle (used to toggle fullscreen state).
-	RECT g_WindowRect;
 
-	// The number of swap chain back buffers.
-	const uint8_t g_NumFrames = 3;
-
-	// DirectX 12 Objects
-	ComPtr<ID3D12Device2> g_Device;
-	ComPtr<ID3D12CommandQueue> g_CommandQueue;
-	ComPtr<IDXGISwapChain4> g_SwapChain;
-	ComPtr<ID3D12Resource> g_BackBuffers[g_NumFrames];
-	ComPtr<ID3D12GraphicsCommandList> g_CommandList;
-	ComPtr<ID3D12CommandAllocator> g_CommandAllocators[g_NumFrames];
-	ComPtr<ID3D12DescriptorHeap> g_RTVDescriptorHeap;
 
 
 	EnableDebugLayer();
