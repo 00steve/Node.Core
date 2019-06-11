@@ -388,6 +388,7 @@ bool DirectX3DGraphics::IsInitialized() {
 
 
 void DirectX3DGraphics::Resize(uint32_t width, uint32_t height){
+
 	if (g_ClientWidth != width || g_ClientHeight != height)
 	{
 		// Don't allow 0 size swap chain back buffers.

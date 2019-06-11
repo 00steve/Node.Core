@@ -100,7 +100,7 @@ private:
 
 	ComPtr<IDXGIAdapter4> GetAdapter(bool useWarp);
 
-	void Resize(uint32_t width, uint32_t height);
+	virtual void Resize(uint32_t width, uint32_t height);
 
 	void SetFullscreen(bool fullscreen);
 

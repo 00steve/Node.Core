@@ -23,6 +23,7 @@ struct RenderSettings {
 class Graphics : public Drawable, public Node{
 private:
 	RenderSettings* parentRenderSettings;
+	RenderSettings renderSettings;
 	Drawable* target;
 
 public:
@@ -37,6 +38,8 @@ public:
 	virtual bool Initialize() = 0;
 
 	RenderSettings* GraphicsRenderSettings();
+
+	virtual void Resize(uint32_t width, uint32_t height) = 0;
 
 	virtual bool SetTarget(Drawable* newTarget);
 

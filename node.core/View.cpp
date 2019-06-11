@@ -34,10 +34,16 @@ void View::Draw() {
 void View::HandleMessage(const Message message) {
 	switch (message.code) {
 	case MESSAGE_PARENT_SETTINGS_CHANGED:
-		//switch(message.subCode){
-		//case PARENT_SETTINGS_CHANGED_SIZE:
-		//	return;
-		//}
+		switch(message.subCode){
+		case PARENT_SETTINGS_CHANGED_SIZE:
+			if (graphics) {
+				Message forward;
+				forward.code = MESSAGE_PARENT_SETTINGS_CHANGED;
+				forward.subCode = PARENT_SETTINGS_CHANGED_SIZE;
+				forward.receiver = graphics;
+				Node::SendAMessage(forward);
+			}
+		}
 		AdjustRenderSettings();
 		return;
 

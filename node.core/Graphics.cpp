@@ -14,12 +14,18 @@ void Graphics::HandleMessage(const Message message) {
 	case MESSAGE_PARENT_SETTINGS_CHANGED:
 		switch (message.subCode) {
 		case PARENT_SETTINGS_CHANGED_SIZE:
+			if (parentRenderSettings->Width == renderSettings.Width && parentRenderSettings->Height == renderSettings.Height) return;
+			renderSettings.Width = parentRenderSettings->Width;
+			renderSettings.Height = parentRenderSettings->Height;
+			Resize(parentRenderSettings->Width, parentRenderSettings->Height);
+			DBOUT("Graphics:parent resized to [" << parentRenderSettings->Width << "," << parentRenderSettings->Height << "]\n");
 			return;
 		}
 		return;
 
 	case MESSAGE_SET_RENDER_SETTINGS:
 		parentRenderSettings = (RenderSettings*)message.data;
+		renderSettings = *parentRenderSettings;
 		DBOUT("Graphics:set render settings\n");
 		DBOUT("\t- window handle :" << (parentRenderSettings->Window ? "true" : "false") << "\n");
 		return;
