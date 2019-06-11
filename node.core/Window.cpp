@@ -51,6 +51,7 @@ LRESULT CALLBACK Window::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 		unsigned int i = window->views.Count();
 		while (i-- > 0) {
 			window->views[i]->Draw();
+			DBOUT("draw\n");
 		}
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(hwnd, &ps);
@@ -103,6 +104,8 @@ Node* Window::AddChild(Node* newNode) {
 	if (dynamic_cast<View*>(newNode)) {
 		AddView((View*)newNode);
 		//Node::CreateAndSendMessage(newNode, MESSAGE_SET_RENDER_SETTINGS, (void*)&renderSettings);
+
+		DBOUT("\t- window:window handle :" << (renderSettings.Window ? "true" : "false") << "\n");
 		Node::CreateAndSendMessageImmediate(newNode, MESSAGE_SET_RENDER_SETTINGS, (void*)&renderSettings);
 		//Message m;
 		//m.sender = this;
@@ -232,6 +235,7 @@ unsigned int Window::Width() {
 }
 
 Window::Window() {
+	Create(10);
 }
 
 Window::~Window() {

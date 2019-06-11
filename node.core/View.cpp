@@ -44,6 +44,7 @@ void View::HandleMessage(const Message message) {
 	case MESSAGE_SET_RENDER_SETTINGS: 
 		parentRenderSettings = (RenderSettings*)message.data;
 		DBOUT("View:set render settings\n");
+		DBOUT("\t- window handle :" << (parentRenderSettings->Window ? "true" : "false") << "\n");
 		AdjustRenderSettings();
 		return;
 	
@@ -68,6 +69,7 @@ bool View::SetGraphics(Graphics* newGraphics) {
 	}
 	if (graphics != newGraphics) {
 		Node::CreateAndSendMessage(newGraphics, MESSAGE_STARTED_REFERENCE, NULL);
+		DBOUT("\t- window handle :" << (renderSettings.Window ? "true" : "false") << "\n");
 		Node::CreateAndSendMessageImmediate(newGraphics, MESSAGE_SET_RENDER_SETTINGS, (void*)&renderSettings);
 		DBOUT("view:set the reference for the graphics to the render settings\n");
 	}

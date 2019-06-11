@@ -21,6 +21,7 @@ void Graphics::HandleMessage(const Message message) {
 	case MESSAGE_SET_RENDER_SETTINGS:
 		parentRenderSettings = (RenderSettings*)message.data;
 		DBOUT("Graphics:set render settings\n");
+		DBOUT("\t- window handle :" << (parentRenderSettings->Window ? "true" : "false") << "\n");
 		return;
 
 	case MESSAGE_STARTED_REFERENCE:

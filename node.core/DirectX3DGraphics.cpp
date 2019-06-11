@@ -312,8 +312,9 @@ ComPtr<IDXGIAdapter4> DirectX3DGraphics::GetAdapter(bool useWarp) {
 
 bool DirectX3DGraphics::Initialize() {
 	RenderSettings* rs = GraphicsRenderSettings();
+	DBOUT("Initialize DirectX 3d graphics\n");
 	if (!rs || !rs->Window) return false;
-	DBOUT("Has valid window handle\n");
+	DBOUT("\t-Has valid window handle\n");
 
 	EnableDebugLayer();
 
@@ -343,7 +344,7 @@ bool DirectX3DGraphics::Initialize() {
 
 	g_CommandQueue = CreateCommandQueue(g_Device, D3D12_COMMAND_LIST_TYPE_DIRECT);
 
-	g_SwapChain = CreateSwapChain(g_hWnd, g_CommandQueue,
+	g_SwapChain = CreateSwapChain(rs->Window, g_CommandQueue,
 		g_ClientWidth, g_ClientHeight, g_NumFrames);
 
 	g_CurrentBackBufferIndex = g_SwapChain->GetCurrentBackBufferIndex();
