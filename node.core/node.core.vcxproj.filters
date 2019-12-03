@@ -31,6 +31,15 @@
     <Filter Include="Header Files\node">
       <UniqueIdentifier>{8d6de5c6-5de2-4bba-9935-3a86b06cf32e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\node\Window">
+      <UniqueIdentifier>{f1624f3d-ef0b-4ebe-aebf-aac509a0c8c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\node\Window">
+      <UniqueIdentifier>{8475f186-6218-4b9e-85a2-0d74ba19da8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{083b2b6e-5f8e-4455-b79c-23057ffc09db}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="int2.h">
@@ -72,6 +81,9 @@
     <ClInclude Include="DirectX3DGraphics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CommandQueue.h">
+      <Filter>Header Files\node\Window</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="int2.cpp">
@@ -105,8 +117,16 @@
     <ClCompile Include="DirectX3DGraphics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CommandQueue.cpp">
+      <Filter>Source Files\node\Window</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="VertexShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

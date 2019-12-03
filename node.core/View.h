@@ -12,6 +12,10 @@ private:
 
 
 
+
+
+
+
 public:
 
 	virtual Node* AddChild(Node* newNode);
