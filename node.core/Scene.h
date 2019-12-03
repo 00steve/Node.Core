@@ -1,15 +1,6 @@
 #pragma once
-
-#include "Node.h"
-#include "Drawable.h"
-
-
-class Scene : public Node, public Drawable{
-
+class Scene{
 public:
-
-
-
 	Scene();
 	~Scene();
 };

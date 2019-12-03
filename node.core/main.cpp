@@ -28,42 +28,35 @@ using namespace Microsoft::WRL;
 
 
 
-#include "Node.h"
-#include "Window.h"
-#include "DirectX3DGraphics.h"
+//#include "Node.h"
+//#include "Window.h"
+//#include "DirectX3DGraphics.h"
+//#include "Component.h"
 
+#include "DirectX12Game.h"
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow) {
 
 
-	Map<Node*> t = Map<Node*>();
-	
-	Node* n = new Node();
-	t.Add("things", n);
-	Node* n3 = new Node();
-	if (n3->Register("things")) {
-		DBOUT("Added newthing\n");
+	//Map<Node*> t = Map<Node*>();
+	//
+	//Node* n = new Node();
+	//t.Add("things", n);
+	//Node* n3 = new Node();
+	//if (n3->Register("things")) {
+	//	DBOUT("Added newthing\n");
+	//}
+	//else {
+	//	DBOUT("Couldn't add newthing\n");
+	//}
+
+
+
+	//create game to contain all of the components
+	DirectX12Game game = DirectX12Game();
+	if (game.Initialize()) {
+		game.Run();
 	}
-	else {
-		DBOUT("Couldn't add newthing\n");
-	}
-
-
-
-	Window* window = new Window();
-
-
-	View* v1 = new View();
-	window->AddChild(v1);
-
-	DirectX3DGraphics* dx3 = new DirectX3DGraphics();
-	v1->AddChild(dx3);
-
-
-	while (window->IsOpen()) {
-		window->Update();
-	}
-	
 
 	return 0;
 }
